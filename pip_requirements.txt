@@ -16,3 +16,15 @@ pre-commit      # hooks for applying linters on commit
 rich            # beautiful text formatting in terminal
 pytest          # tests
 einops
+datasets==4.0.0 # for loading datasets
+
+ipython
+jsonlines
+numpy
+pandas
+debugpy
+scikit-learn
+scipy
+tqdm
+transformers
+wandb
