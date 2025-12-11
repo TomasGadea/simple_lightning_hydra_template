@@ -1,7 +1,7 @@
 # @package _global_
 
 # specify here default configuration
-# order of defaults determines the order in which configs override each other
+# order of defaults determines the order in which config override each other
 defaults:
   - _self_
   - data: default
@@ -9,7 +9,7 @@ defaults:
   - callbacks: default
   - trainer: gpu
 
-  # experiment configs allow for version control of specific hyperparameters
+  # experiment config allow for version control of specific hyperparameters
   # e.g. best hyperparameters for given model and datamodule
   - experiment: null
 
@@ -17,7 +17,7 @@ defaults:
 task_name: "train"
 
 # tags to help you identify your experiments
-# you can overwrite this in experiment configs
+# you can overwrite this in experiment config
 # overwrite from command line with `python train.py tags="[first_tag, second_tag]"`
 tags: ["dev"]
 
@@ -67,7 +67,7 @@ paths:
   log_dir: ${paths.root_dir}/logs/
 
   # path to output directory, created dynamically by hydra
-  # path generation pattern is specified in `configs/hydra/default.yaml`
+  # path generation pattern is specified in `config/hydra/default.yaml`
   # use it to store all files generated during the run, like ckpts and metrics
   output_dir: ${hydra:runtime.output_dir}
 

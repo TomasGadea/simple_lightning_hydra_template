@@ -1,8 +1,8 @@
 # @package _global_
 
 defaults:
-  - override /model: linear
-  - override /data/dataset: sphere
+  - override /model: llama
+  - override /data: parity
 
 logger:
   entity: "epfl-dlab"
@@ -25,12 +25,13 @@ data:
 
 model:
   optimizer:
+    _target_: torch.optim.Adam
     lr: 0.0001
     
   model_params:
     monitor: 'val/loss'
   
-          
   scheduler:
+    _target_: torch.optim.lr_scheduler.ReduceLROnPlateau
     scheduler_config:
       monitor: ${model.model_params.monitor}

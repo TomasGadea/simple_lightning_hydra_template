@@ -2,7 +2,7 @@ from typing import Any, Dict, Tuple, List
 import hydra
 import torch
 from lightning import LightningModule
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, DictConfig
 
 class LitModuleBase(LightningModule):
     """Example of a `LightningModule`
@@ -42,6 +42,7 @@ class LitModuleBase(LightningModule):
         model_params: Dict[str, Any],
         optimizer: torch.optim.Optimizer,
         scheduler: torch.optim.lr_scheduler,
+        model: torch.nn.Module = None,
     ) -> None:
         """Initialize a `SigmaeLitModule`.
 
@@ -57,6 +58,11 @@ class LitModuleBase(LightningModule):
         # also ensures init params will be stored in ckpt
         self.save_hyperparameters(logger=False)
 
+        if isinstance(model, DictConfig):
+            self.model = hydra.utils.instantiate(model)
+        else:
+            self.model = model
+
         self.parametric_models = self._initialize_models()
 
         self.logging_kwargs = {
@@ -65,8 +71,10 @@ class LitModuleBase(LightningModule):
             'test': {'on_step': False, 'on_epoch': True, 'prog_bar': True, 'sync_dist': True}
         }
 
-    def _initialize_models(self, models_config: Dict[str, torch.nn.Module]) -> None:
-        NotImplementedError
+    def _initialize_models(self) -> List[torch.nn.Module]:
+        if self.model:
+            return [self.model]
+        raise NotImplementedError
 
     def forward(self, batch, stage='learn') -> torch.Tensor:
         """Perform a forward pass through the model `self.net`.
@@ -151,7 +159,7 @@ class LitModuleBase(LightningModule):
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
         Normally you'd need one. But in the case of GANs or similar you might have multiple.
         """
-        optimizer = hydra.utils.instantiate(self.hparams.optimizer, params=self.trainer.model.parameters())
+        optimizer = hydra.utils.instantiate(self.hparams.optimizer, params=self.parameters())
 
         if self.hparams.scheduler is not None:
             # Create a copy of self.hparams.scheduler without modifying the original

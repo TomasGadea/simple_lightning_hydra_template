@@ -1,7 +1,6 @@
-defaults:
-  - dataset: ???
+dataset: ???
 
-_target_: src.data.PLDataModule
+_target_: src.data.base_datamodule.BaseDatamodule
 
 batch_size: 128 # Needs to be divisible by the number of devices (e.g., if in a distributed setup)
 
