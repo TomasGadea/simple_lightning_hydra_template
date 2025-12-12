@@ -35,6 +35,21 @@ from src.utils.utils import (
 )
 from src.utils import hydra_custom_resolvers
 
+import torch
+import typing
+from omegaconf import DictConfig
+from omegaconf.base import ContainerMetadata
+from torch.serialization import add_safe_globals
+
+add_safe_globals([
+    DictConfig,
+    ContainerMetadata,
+    typing.Any,
+    dict,
+    list,
+    tuple,
+    set,
+])
 log = RankedLogger(__name__, rank_zero_only=True)
 
 @task_wrapper

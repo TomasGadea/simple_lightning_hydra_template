@@ -18,7 +18,7 @@ class LitModuleBase(LightningModule):
     # This hook is called on every process when using DDP.
 
     def training_step(self, batch, batch_idx):
-    # The complete training step.
+    # The complete training step.3
 
     def validation_step(self, batch, batch_idx):
     # The complete validation step.
@@ -96,8 +96,20 @@ class LitModuleBase(LightningModule):
             - A tensor of predictions.
             - A tensor of target labels.
         """
-        NotImplementedError
+        # NotImplementedError
+        # print("batch:", batch)  
+        # raise ValueError("stop cuz batch")
 
+        seq = batch["sequence"].long()   # shape [B, 20]
+        # shift labels 
+        input_ids = seq
+        labels = seq.clone()
+        labels[:, :-1] = seq[:, 1:]
+        labels[:, -1] = -100  # ignore last position
+
+        outputs = self.model(input_ids=input_ids, labels=labels)
+        loss = outputs.loss
+        return loss
 
     def training_step(
         self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int
@@ -111,7 +123,7 @@ class LitModuleBase(LightningModule):
         """
         loss = self.model_step(batch, stage='learn')
         self.log("learn/loss", loss, **self.logging_kwargs['learn'])
-        return 
+        return loss
     
 
     def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
@@ -123,7 +135,7 @@ class LitModuleBase(LightningModule):
         """
         loss = self.model_step(batch, stage='val')
         self.log("val/loss", loss, **self.logging_kwargs['val'])
-
+        return loss
     
     def on_validation_epoch_end(self) -> None:
         # log learning rate
