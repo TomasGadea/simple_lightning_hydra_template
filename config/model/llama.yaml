@@ -1,8 +1,9 @@
 defaults:
   - default
-  
+
 model: 
-  _target_: transformers.LlamaForCausalLM
+  # _target_: transformers.LlamaForCausalLM
+  _target_: src.models.llama.LlamaLitModel
 
   config: 
     _target_: transformers.LlamaConfig
