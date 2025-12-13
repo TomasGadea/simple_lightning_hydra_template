@@ -5,7 +5,8 @@ import lightning as L
 import rootutils
 from lightning import Callback, LightningDataModule, LightningModule, Trainer
 from omegaconf import DictConfig
-
+import warnings
+warnings.filterwarnings("ignore")
 
 rootutils.setup_root(__file__, indicator=".project-root", pythonpath=True)
 # ------------------------------------------------------------------------------------ #
@@ -37,19 +38,8 @@ from src.utils import hydra_custom_resolvers
 
 import torch
 import typing
-from omegaconf import DictConfig
-from omegaconf.base import ContainerMetadata
-from torch.serialization import add_safe_globals
 
-add_safe_globals([
-    DictConfig,
-    ContainerMetadata,
-    typing.Any,
-    dict,
-    list,
-    tuple,
-    set,
-])
+
 log = RankedLogger(__name__, rank_zero_only=True)
 
 @task_wrapper
@@ -109,6 +99,12 @@ def train(cfg: DictConfig) -> Tuple[Dict[str, Any], Dict[str, Any]]:
         if ckpt_path == "":
             log.warning("Best ckpt not found! Using current weights for testing...")
             ckpt_path = None
+        
+        # added to not get checkpoint errors(if dependanncy issues arise)
+        # ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
+        # model.load_state_dict(ckpt["state_dict"], strict=True)
+        # trainer.test(model=model, datamodule=datamodule, ckpt_path=None)
+
         trainer.test(model=model, datamodule=datamodule, ckpt_path=ckpt_path)
         log.info(f"Best ckpt path: {ckpt_path}")
 
